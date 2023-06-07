@@ -16,6 +16,7 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Book create(@RequestBody Book newBook) {
         return bookService.create(newBook);
