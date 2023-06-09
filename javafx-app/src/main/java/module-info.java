@@ -4,6 +4,6 @@ module hr.algebra.bookify.frontend {
     requires spring.web;
 
 
-    opens hr.algebra.bookify.frontend to javafx.fxml;
-    exports hr.algebra.bookify.frontend;
+    opens hr.algebra.bookify.javafxapp to javafx.fxml;
+    exports hr.algebra.bookify.javafxapp;
 }

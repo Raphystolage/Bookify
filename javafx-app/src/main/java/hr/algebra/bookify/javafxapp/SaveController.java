@@ -1,4 +1,4 @@
-package hr.algebra.bookify.frontend;
+package hr.algebra.bookify.javafxapp;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
-import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;

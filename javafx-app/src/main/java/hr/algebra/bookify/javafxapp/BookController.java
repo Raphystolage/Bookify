@@ -1,4 +1,4 @@
-package hr.algebra.bookify.frontend;
+package hr.algebra.bookify.javafxapp;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -64,12 +64,17 @@ public class BookController implements Initializable {
 
     @FXML
     protected void onGetByIdButtonClick() {
-        Long id = Long.valueOf(getByIdTextField.getText());
-        Book book = bookService.getById(id);
-        ObservableList<Book> bookList = FXCollections.observableArrayList();
-        bookList.add(book);
-        bookTable.setItems(bookList);
-        System.out.println(book);
+        long id;
+        try {
+            id = Long.parseLong(getByIdTextField.getText());
+            Book book = bookService.getById(id);
+            ObservableList<Book> bookList = FXCollections.observableArrayList();
+            bookList.add(book);
+            bookTable.setItems(bookList);
+            System.out.println(book);
+        } catch(NumberFormatException nfe) {
+            return;
+        }
     }
 
     protected void openSaveView(Book... book) throws IOException {

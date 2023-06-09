@@ -1,4 +1,4 @@
-package hr.algebra.bookify.frontend;
+package hr.algebra.bookify.javafxapp;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;

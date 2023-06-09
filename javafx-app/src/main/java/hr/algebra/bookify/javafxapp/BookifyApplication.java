@@ -1,4 +1,4 @@
-package hr.algebra.bookify.frontend;
+package hr.algebra.bookify.javafxapp;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
