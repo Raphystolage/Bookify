@@ -16,10 +16,10 @@ public class Book {
     @Enumerated(value = EnumType.STRING)
     private BookType type;
     private LocalDate releaseDate;
-    private double price;
+    private Double price;
 
     public Book() {}
-    public Book(Long id, String title, String author, BookType type, LocalDate releaseDate, double price) {
+    public Book(Long id, String title, String author, BookType type, LocalDate releaseDate, Double price) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -43,7 +43,7 @@ public class Book {
     public LocalDate getReleaseDate() {
         return releaseDate;
     }
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
@@ -62,7 +62,7 @@ public class Book {
     public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
