@@ -1,5 +1,7 @@
 package hr.algebra.bookify.webapp;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 
 public class Book {
@@ -8,6 +10,7 @@ public class Book {
     private String title;
     private String author;
     private BookType type;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
     private Double price;
 
