@@ -1,47 +1,47 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8">
-    <title>Bookify: Add/Edit book</title>
-  </head>
-  <body>
-    <h1>Bookify</h1>
-    <h2>Add/Edit book</h2>
-    <form th:object="${book}" th:action="@{/book/new}" method="post">
-      <input type="hidden" th:field="*{id}">
-      <table>
-        <tr>
-          <td>Title:</td>
-          <td><input type="text" th:field="*{title}" size="50" required></td>
-        </tr>
-        <tr>
-          <td>Author:</td>
-          <td><input type="text" th:field="*{author}" size="50" required></td>
-        </tr>
-        <tr>
-          <td>Type:</td>
-          <td>
-            <select id="bookType" name="bookType" required>
-              <option value="">Select type</option>
-              <option th:each="type : ${T(hr.algebra.bookify.webapp.BookType).values()}" th:selected="${type == book.type}" th:value="${type}" th:text="${type}"></option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td>Release date:</td>
-          <td><input type="date" th:field="*{releaseDate}" required></td>
-        </tr>
-        <tr>
-          <td>Price:</td>
-          <td><input type="number" th:field="*{price}" step="0.01" required></td>
-        </tr>
-        <tr>
-          <td><input type="submit" value="Save"></td>
-          <td></td>
-        </tr>
-      </table>
-    </form>
-    <br>
-    <a th:href="@{/book}"><button>Cancel</button></a>
-  </body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Bookify: Add/Edit book</title>
+        <link th:rel="stylesheet" th:href="@{/stylesheet.css}" />
+        <link th:rel="icon" th:href="@{/icon.png}">
+    </head>
+    <body>
+        <h1>Bookify</h1>
+        <h2>Add/Edit book</h2>
+        <form th:object="${book}" th:action="${redirectionUrl}" method="post">
+            <input type="hidden" th:field="*{id}">
+            <table>
+                <tr>
+                    <td>Title:</td>
+                    <td><input type="text" th:field="*{title}" size="50" required></td>
+                </tr>
+                <tr>
+                    <td>Author:</td>
+                    <td><input type="text" th:field="*{author}" size="50" required></td>
+                </tr>
+                <tr>
+                    <td>Type:</td>
+                    <td>
+                        <select id="bookType" name="bookType" required>
+                            <option value="">Select type</option>
+                            <option th:each="type : ${T(hr.algebra.bookify.webapp.BookType).values()}" th:selected="${type == book.type}" th:value="${type}" th:text="${type}"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Release date:</td>
+                    <td><input type="date" th:field="*{releaseDate}" required></td>
+                </tr>
+                <tr>
+                    <td>Price:</td>
+                    <td><input type="number" th:field="*{price}" step="0.01" required></td>
+                </tr>
+            </table>
+            </br>
+            <input type="submit" value="Save">
+        </form>
+        <br>
+        <a th:href="@{/book}"><button>Cancel</button></a>
+    </body>
 </html>

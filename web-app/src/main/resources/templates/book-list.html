@@ -3,6 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <title>Bookify: Book list</title>
+        <link th:rel="stylesheet" th:href="@{/stylesheet.css}" />
+        <link th:rel="icon" th:href="@{/icon.png}">
     </head>
     <body>
         <h1>Bookify</h1>
@@ -45,5 +47,8 @@
         </table>
         <br/>
         <a href="/book/new"><button>New Book</button></a>
+        <br/>
+        <br/>
+        <a href="/book/export"><button>Export all books</button></a>
     </body>
 </html>
