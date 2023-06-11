@@ -1,6 +1,8 @@
 package hr.algebra.bookify.webapp;
 
 import com.opencsv.CSVWriter;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +26,6 @@ public class BookController {
 
     Logger logger = LoggerFactory.getLogger(BookController.class);
 
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     @GetMapping
     public String getAll(Model model) {
@@ -35,7 +34,7 @@ public class BookController {
     }
 
     @PostMapping("getById")
-    public String getById(@Nullable @RequestParam("id") String id) {
+    public String postGetById(@Nullable @RequestParam("id") String id) {
         try {
             Long.valueOf(id);
         } catch(NumberFormatException nfe) {
@@ -65,6 +64,7 @@ public class BookController {
         return "book-form";
     }
 
+    @Timed(value = "create.time", description = "Execution time of creation")
     @PostMapping("new")
     public String create(@ModelAttribute("book") Book book, @RequestParam("bookType") String bookType) {
         book.setType(BookType.valueOf(bookType));
@@ -87,14 +87,17 @@ public class BookController {
         return "redirect:/book";
     }
 
+    @Timed(value = "delete.time", description = "Execution time of deletion")
     @GetMapping("delete/{id}")
     public String deleteById(@PathVariable("id") Long id) {
         bookService.deleteById(id);
         return "redirect:/book";
     }
 
+    @Timed(value = "export.time", description = "Execution time of export method")
     @GetMapping("export")
     public String export() {
+
         String fileName = "output.csv";
         try (CSVWriter writer = new CSVWriter(new FileWriter(new File("out",fileName)))) {
             String[] header = {"ID", "Title", "Author", "Type", "Release Date", "Price"};
