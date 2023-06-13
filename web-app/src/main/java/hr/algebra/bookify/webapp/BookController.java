@@ -83,8 +83,9 @@ public class BookController {
     }
 
     @PostMapping("edit/{id}")
-    public String update(@PathVariable("id") Long id, @ModelAttribute("book") Book book) {
+    public String update(@PathVariable("id") Long id, @ModelAttribute("book") Book book, @RequestParam("bookType") String bookType) {
         book.setId(id);
+        book.setType(BookType.valueOf(bookType));
         bookService.update(book);
         return "redirect:/book";
     }

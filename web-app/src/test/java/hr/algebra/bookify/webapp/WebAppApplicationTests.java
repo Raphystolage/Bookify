@@ -62,6 +62,4 @@ class WebAppApplicationTests {
         bookService.deleteById(addedBook.getId());
     }
 
-
-
 }
