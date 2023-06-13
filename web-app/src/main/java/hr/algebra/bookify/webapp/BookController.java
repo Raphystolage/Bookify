@@ -29,7 +29,9 @@ public class BookController {
 
     @GetMapping
     public String getAll(Model model) {
-        model.addAttribute("books", bookService.getAll());
+        List<Book> books = bookService.getAll();
+        model.addAttribute("books", books);
+        logger.info("Total price: " + bookService.calculateTotalPrice(books).toString());
         return "book-list";
     }
 

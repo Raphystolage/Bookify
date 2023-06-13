@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -38,5 +40,24 @@ public class BookService {
     public void deleteById(Long id) {
         REST_TEMPLATE.delete(URL+"/"+id);
     }
+
+    public List<Book> filterBooksByAuthor(List<Book> books, String author) {
+        return books.stream()
+                .filter(book -> book.getAuthor().equals(author))
+                .collect(Collectors.toList());
+    }
+
+    public Double calculateTotalPrice(List<Book> books) {
+        return books.stream()
+                .mapToDouble(Book::getPrice)
+                .sum();
+    }
+
+    public List<Book> sortBooksByReleaseDate(List<Book> books) {
+        return books.stream()
+                .sorted(Comparator.comparing(Book::getReleaseDate))
+                .collect(Collectors.toList());
+    }
+
 
 }
