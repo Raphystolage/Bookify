@@ -2,43 +2,15 @@ package hr.algebra.bookify.backend.controller;
 
 import hr.algebra.bookify.backend.model.Book;
 import hr.algebra.bookify.backend.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("book")
-public class BookController {
+public class BookController extends AbstractController<Book> {
 
-    @Autowired
-    private BookService bookService;
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    public Book create(@RequestBody Book newBook) {
-        return bookService.create(newBook);
-    }
-
-    @GetMapping
-    public List<Book> getAll() {
-        return bookService.getAll();
-    }
-
-    @GetMapping("{id}")
-    public Book getById(@PathVariable Long id) {
-        return bookService.getById(id).orElse(null);
-    }
-
-    @PutMapping
-    public Book update(@RequestBody Book updatedBook) {
-        return bookService.update(updatedBook);
-    }
-
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable Long id) {
-        bookService.deleteById(id);
+    public BookController(BookService service) {
+        super(service);
     }
 
 }
