@@ -1,7 +1,6 @@
 package hr.algebra.bookify.webapp;
 
 import com.opencsv.CSVWriter;
-import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
