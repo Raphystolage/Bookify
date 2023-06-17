@@ -37,14 +37,14 @@ public abstract class AbstractController<T> {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public T create(@RequestBody T newObject) {
-        JMS_TEMPLATE.convertAndSend("Create object");
+        JMS_TEMPLATE.convertAndSend("Create " + newObject.getClass().getSimpleName());
         return service.create(newObject);
     }
 
     @PutMapping
-    public T update(@RequestBody T updatedClassicDBStorable) {
-        JMS_TEMPLATE.convertAndSend("Update object");
-        return service.update(updatedClassicDBStorable);
+    public T update(@RequestBody T updatedObject) {
+        JMS_TEMPLATE.convertAndSend("Update " + updatedObject.getClass().getSimpleName());
+        return service.update(updatedObject);
     }
 
     @DeleteMapping("{id}")

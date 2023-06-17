@@ -10,31 +10,30 @@ import java.util.Objects;
 
 public class BookService {
 
-    private static final String URL = "http://localhost:8080/book";
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
 
     public Book create(Book newBook) {
         HttpEntity<Book> request = new HttpEntity<>(newBook);
-        ResponseEntity<Book> response = REST_TEMPLATE.exchange(URL, HttpMethod.POST, request, Book.class);
+        ResponseEntity<Book> response = REST_TEMPLATE.exchange("http://localhost:8081/", HttpMethod.POST, request, Book.class);
         return response.getBody();
     }
 
     public Book getById(Long id) {
-        return REST_TEMPLATE.getForObject(URL+"/"+id, Book.class);
+        return REST_TEMPLATE.getForObject("http://localhost:8082/?id="+id, Book.class);
     }
 
     public List<Book> getAll() {
-        ResponseEntity<Book[]> response = REST_TEMPLATE.getForEntity(URL, Book[].class);
+        ResponseEntity<Book[]> response = REST_TEMPLATE.getForEntity("http://localhost:8080/book", Book[].class);
         return List.of(Objects.requireNonNull(response.getBody()));
     }
 
     public void update(Book updatedBook) {
         HttpEntity<Book> request = new HttpEntity<>(updatedBook);
-        ResponseEntity<Book> response = REST_TEMPLATE.exchange(URL, HttpMethod.PUT, request, Book.class);
+        ResponseEntity<Book> response = REST_TEMPLATE.exchange("http://localhost:8083/", HttpMethod.PUT, request, Book.class);
     }
 
     public void deleteById(Long id) {
-        REST_TEMPLATE.delete(URL+"/"+id);
+        REST_TEMPLATE.delete("http://localhost:8084/?id="+id);
     }
 
 }
