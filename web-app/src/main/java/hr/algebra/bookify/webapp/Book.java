@@ -2,9 +2,10 @@ package hr.algebra.bookify.webapp;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.*;
 import java.time.LocalDate;
 
-public class Book {
+public class Book implements Serializable {
 
     private Long id;
     private String title;
@@ -72,4 +73,5 @@ public class Book {
                 "Book release date: " + this.getReleaseDate() + "\n" +
                 "Book price: " + this.getPrice();
     }
+    
 }

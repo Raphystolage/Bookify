@@ -50,5 +50,11 @@
         <br/>
         <br/>
         <a href="/book/export"><button>Export all books</button></a>
+        <br/>
+        <br/>
+        <form th:action="@{/book/import}" method="post" enctype="multipart/form-data">
+            <button type="submit">Import books from disk</button>
+            <input type="file" name="file" />
+        </form>
     </body>
 </html>

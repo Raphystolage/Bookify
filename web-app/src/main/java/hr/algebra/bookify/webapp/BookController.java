@@ -1,18 +1,24 @@
 package hr.algebra.bookify.webapp;
 
-import com.opencsv.CSVWriter;
-import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +30,6 @@ public class BookController {
     private BookService bookService;
 
     Logger logger = LoggerFactory.getLogger(BookController.class);
-
 
     @GetMapping
     public String getAll(Model model) {
@@ -65,11 +70,18 @@ public class BookController {
         return "book-form";
     }
 
-    @Timed(value = "create.time", description = "Execution time of creation")
     @PostMapping("new")
-    public String create(@ModelAttribute("book") Book book, @RequestParam("bookType") String bookType) {
+    public String create(@ModelAttribute("book") Book book,
+                         @RequestParam("bookType") String bookType,
+                         @RequestParam("title") String title,
+                         @RequestParam("author") String author) {
+        book.setTitle(title);
+        book.setAuthor(author);
         book.setType(BookType.valueOf(bookType));
-        bookService.create(book);
+        if(StringSecurity.isSafe(title+author))
+            bookService.create(book);
+        else
+            logger.error("Unauthorized character or word detected");
         return "redirect:/book";
     }
 
@@ -82,45 +94,62 @@ public class BookController {
     }
 
     @PostMapping("edit/{id}")
-    public String update(@PathVariable("id") Long id, @ModelAttribute("book") Book book, @RequestParam("bookType") String bookType) {
+    public String update(@PathVariable("id") Long id, @ModelAttribute("book") Book book,
+                         @RequestParam("bookType") String bookType,
+                         @RequestParam("title") String title,
+                         @RequestParam("author") String author) {
         book.setId(id);
+        book.setTitle(title);
+        book.setAuthor(author);
         book.setType(BookType.valueOf(bookType));
-        bookService.update(book);
+        if(StringSecurity.isSafe(title+author))
+            bookService.update(book);
+        else
+            logger.error("Unauthorized characters or word detected");
         return "redirect:/book";
     }
 
-    @Timed(value = "delete.time", description = "Execution time of deletion")
     @GetMapping("delete/{id}")
     public String deleteById(@PathVariable("id") Long id) {
         bookService.deleteById(id);
         return "redirect:/book";
     }
 
-    @Timed(value = "export.time", description = "Execution time of export method")
     @GetMapping("export")
-    public String export() {
+    public ResponseEntity<Resource> export() {
+        String fileName = SerializeBookList.serializeBookList(new ArrayList<>(bookService.getAll()));
 
-        String fileName = "output.csv";
-        try (CSVWriter writer = new CSVWriter(new FileWriter(new File("out",fileName)))) {
-            String[] header = {"ID", "Title", "Author", "Type", "Release Date", "Price"};
-            writer.writeNext(header);
+        Resource resource = new FileSystemResource(fileName);
 
-            for (Book book : bookService.getAll()) {
-                String[] data = {
-                    String.valueOf(book.getId()),
-                    book.getTitle(),
-                    book.getAuthor(),
-                    book.getType().toString(),
-                    book.getReleaseDate().toString(),
-                    String.valueOf(book.getPrice())
-                };
-                writer.writeNext(data);
-            }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 
-            logger.info("Export successful. File saved at: " + fileName);
-        } catch (IOException e) {
-            logger.error("Export failed. Error: " + e.getMessage());
+    @PostMapping("/import")
+    public String importBooks(@RequestParam("file") MultipartFile file) {
+
+        if (file.isEmpty()) {
+            logger.warn("Empty ser file");
+            return "redirect:/book";
         }
+
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        try {
+            Path path = Paths.get(fileName);
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<Book> books = SerializeBookList.deserializeBookList(fileName);
+        for(Book book : books) {
+            book.setId(null);
+            bookService.create(book);
+            logger.info("Book \"" + book.getTitle() + "\" imported");
+        }
+
         return "redirect:/book";
     }
 
