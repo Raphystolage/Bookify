@@ -1,6 +1,6 @@
 package hr.algebra.bookify.backend.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.time.LocalDate;
 

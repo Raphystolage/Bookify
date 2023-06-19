@@ -6,3 +6,9 @@ VALUES
     ('A Song of Ice and Fire: A Game of Thrones', 'George R. R. Martin', 'NOVEL', '1996-08-01', 18.50),
     ('One Piece, Vol. 1: Romance Dawn', 'Eiichiro Oda', 'MANGA', '1997-12-24', 6.99),
     ('The Contemplations', 'Victor Hugo', 'POETRY', '1856-01-01', 13.03);
+
+DELETE FROM `BookifyUser`;
+INSERT INTO `BookifyUser` (id, username, password, authority)
+values
+    (1, 'user', '$2a$12$h0HcS2QDb/7zPASbLa2GoOTSRP6CWK0oX7pCK.dPjkM6L5N4pNovi', 'USER'),
+    (2, 'admin', '$2a$12$INo0nbj40sQrTB7b28KJput/bNltGmFyCfRsUhvy73qcXo5/XdsTG', 'ADMIN');
