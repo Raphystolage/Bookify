@@ -40,9 +40,4 @@ public class StringSecurity {
         return !stringToTest.toUpperCase().matches(checkRegex());
     }
 
-    public static void main(String[] args) {
-        System.out.println(checkRegex());
-        System.out.println(isSafe("SELECT *"));
-    }
-
 }

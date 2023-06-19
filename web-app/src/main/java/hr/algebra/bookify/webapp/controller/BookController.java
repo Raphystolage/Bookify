@@ -1,11 +1,13 @@
 package hr.algebra.bookify.webapp.controller;
 
+import hr.algebra.bookify.webapp.model.JWT;
 import hr.algebra.bookify.webapp.service.BookService;
 import hr.algebra.bookify.webapp.service.SerializeBookList;
 import hr.algebra.bookify.webapp.security.StringSecurity;
 import hr.algebra.bookify.webapp.model.Book;
 import hr.algebra.bookify.webapp.model.BookType;
 import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +39,12 @@ public class BookController {
     Logger logger = LoggerFactory.getLogger(BookController.class);
 
     @GetMapping
-    public String getAll(Model model) {
-        List<Book> books = bookService.getAll();
+    public String getAll(Model model, HttpSession session) {
+        String token = getToken(session);
+        if(token==null)
+            return "redirect:/";
+        List<Book> books = bookService.getAll(token);
         model.addAttribute("books", books);
-        logger.info("Total price: " + bookService.calculateTotalPrice(books).toString());
         return "book-list";
     }
 
@@ -56,8 +60,11 @@ public class BookController {
     }
 
     @GetMapping("{id}")
-    public String getById(@PathVariable("id") Long id, Model model) {
-        Book book = bookService.getById(id);
+    public String getById(@PathVariable("id") Long id, Model model, HttpSession session) {
+        String token = getToken(session);
+        if(token==null)
+            return "redirect:/";
+        Book book = bookService.getById(id, token);
         if(book==null) {
             return "redirect:/book";
         } else {
@@ -79,20 +86,27 @@ public class BookController {
     public String create(@ModelAttribute("book") Book book,
                          @RequestParam("bookType") String bookType,
                          @RequestParam("title") String title,
-                         @RequestParam("author") String author) {
+                         @RequestParam("author") String author,
+                         HttpSession session) {
         book.setTitle(title);
         book.setAuthor(author);
         book.setType(BookType.valueOf(bookType));
-        if(StringSecurity.isSafe(title+author))
-            bookService.create(book);
-        else
+        if(StringSecurity.isSafe(title+author)) {
+            String token = getToken(session);
+            if(token==null)
+                return "redirect:/";
+            bookService.create(book, token);
+        } else
             logger.error("Unauthorized character or word detected");
         return "redirect:/book";
     }
 
     @GetMapping("edit/{id}")
-    public String showUpdateForm(@PathVariable("id") Long id, Model model) {
-        Book book = bookService.getById(id);
+    public String showUpdateForm(@PathVariable("id") Long id, Model model, HttpSession session) {
+        String token = getToken(session);
+        if(token==null)
+            return "redirect:/";
+        Book book = bookService.getById(id, token);
         model.addAttribute("book", book);
         model.addAttribute("redirectionUrl","/book/edit/"+id);
         return "book-form";
@@ -102,27 +116,37 @@ public class BookController {
     public String update(@PathVariable("id") Long id, @ModelAttribute("book") Book book,
                          @RequestParam("bookType") String bookType,
                          @RequestParam("title") String title,
-                         @RequestParam("author") String author) {
+                         @RequestParam("author") String author,
+                         HttpSession session) {
         book.setId(id);
         book.setTitle(title);
         book.setAuthor(author);
         book.setType(BookType.valueOf(bookType));
-        if(StringSecurity.isSafe(title+author))
-            bookService.update(book);
-        else
+        if(StringSecurity.isSafe(title+author)) {
+            String token = getToken(session);
+            if(token==null)
+                return "redirect:/";
+            bookService.update(book, token);
+        } else
             logger.error("Unauthorized characters or word detected");
         return "redirect:/book";
     }
 
     @GetMapping("delete/{id}")
-    public String deleteById(@PathVariable("id") Long id) {
-        bookService.deleteById(id);
+    public String deleteById(@PathVariable("id") Long id, HttpSession session) {
+        String token = getToken(session);
+        if(token==null)
+            return "redirect:/";
+        bookService.deleteById(id, token);
         return "redirect:/book";
     }
 
     @GetMapping("export")
-    public ResponseEntity<Resource> export() {
-        String fileName = SerializeBookList.serializeBookList(new ArrayList<>(bookService.getAll()));
+    public ResponseEntity<Resource> export(HttpSession session) {
+        String token = getToken(session);
+        if(token==null)
+            return null;
+        String fileName = SerializeBookList.serializeBookList(new ArrayList<>(bookService.getAll(token)));
 
         Resource resource = new FileSystemResource(fileName);
 
@@ -132,7 +156,7 @@ public class BookController {
     }
 
     @PostMapping("/import")
-    public String importBooks(@RequestParam("file") MultipartFile file) {
+    public String importBooks(@RequestParam("file") MultipartFile file, HttpSession session) {
 
         if (file.isEmpty()) {
             logger.warn("Empty ser file");
@@ -151,11 +175,19 @@ public class BookController {
         List<Book> books = SerializeBookList.deserializeBookList(fileName);
         for(Book book : books) {
             book.setId(null);
-            bookService.create(book);
+            String token = getToken(session);
+            if(token==null)
+                return "redirect:/";
+            bookService.create(book, token);
             logger.info("Book \"" + book.getTitle() + "\" imported");
         }
 
         return "redirect:/book";
+    }
+    
+    public String getToken(HttpSession session) {
+        Object attribute = session.getAttribute("token");
+        return attribute==null ? null : ((JWT) attribute).getJwt();
     }
 
 }
