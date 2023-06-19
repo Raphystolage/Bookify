@@ -24,7 +24,7 @@ public abstract class AbstractController<T> {
 
     @GetMapping("{id}")
     public T getById(@PathVariable final Long id) {
-        JMS_TEMPLATE.convertAndSend("Get objects by id " + id);
+        JMS_TEMPLATE.convertAndSend("Get object by id " + id);
         return service.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
