@@ -1,5 +1,6 @@
-package hr.algebra.bookify.webapp;
+package hr.algebra.bookify.webapp.service;
 
+import hr.algebra.bookify.webapp.model.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

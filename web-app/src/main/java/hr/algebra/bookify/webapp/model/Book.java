@@ -1,4 +1,4 @@
-package hr.algebra.bookify.webapp;
+package hr.algebra.bookify.webapp.model;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

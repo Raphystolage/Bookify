@@ -1,5 +1,6 @@
-package hr.algebra.bookify.webapp;
+package hr.algebra.bookify.webapp.service;
 
+import hr.algebra.bookify.webapp.model.Book;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;

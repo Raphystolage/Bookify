@@ -1,4 +1,4 @@
-package hr.algebra.bookify.webapp;
+package hr.algebra.bookify.webapp.security;
 
 import java.util.Arrays;
 
