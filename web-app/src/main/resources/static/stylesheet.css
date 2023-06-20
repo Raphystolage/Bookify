@@ -53,11 +53,7 @@ form {
     border-radius: 3px;
 }
 
-input[type="text"] {
-    padding: 5px;
-    font-size: 14px;
-}
-
+input[type="text"],
 input[type="number"],
 input[type="date"],
 select {
