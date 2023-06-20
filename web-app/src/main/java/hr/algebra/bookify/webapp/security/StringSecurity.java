@@ -11,7 +11,8 @@ public class StringSecurity {
             "ALTER",
             "CREATE",
             "DROP",
-            "DELETE"
+            "DELETE",
+            "OR"
     };
 
     public final static String[] CHAR_BLACK_LIST = {
@@ -38,6 +39,10 @@ public class StringSecurity {
 
     public static boolean isSafe(String stringToTest) {
         return !stringToTest.toUpperCase().matches(checkRegex());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(checkRegex());
     }
 
 }

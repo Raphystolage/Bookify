@@ -3,7 +3,7 @@ package hr.algebra.bookify.webapp.controller;
 import hr.algebra.bookify.webapp.model.JWT;
 import hr.algebra.bookify.webapp.model.User;
 import hr.algebra.bookify.webapp.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,12 @@ public class LoginController {
     private UserService userService;
 
     @GetMapping
-    public String login() {
+    public String login(HttpSession session) {
+        Object attribute = session.getAttribute("token");
+        JWT token = attribute==null ? null : (JWT) attribute;
+        if(token!=null)
+            return "redirect:/book";
+
         return "login";
     }
 

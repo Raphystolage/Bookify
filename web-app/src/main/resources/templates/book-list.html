@@ -7,9 +7,10 @@
         <link th:rel="icon" th:href="@{/icon.png}">
     </head>
     <body>
-        <h1>Bookify</h1>
+        <h1><a th:href="@{/}">Bookify</a></h1>
         <h2>Book list</h2>
         <form th:action="@{/book/getById}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <input type="text" name="id" placeholder="Enter Book ID">
             <button type="submit">Get Book by ID</button>
         </form>
@@ -40,6 +41,7 @@
                 </td>
                 <td>
                     <form th:action="@{/book/delete/{id}(id=${book.id})}" method="get">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit">Delete</button>
                     </form>
                 </td>
@@ -53,8 +55,12 @@
         <br/>
         <br/>
         <form th:action="@{/book/import}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit">Import books from disk</button>
             <input type="file" name="file" />
         </form>
+        <br/>
+        <br/>
+        <a th:href="@{/logout}"><button>Log out</button></a>
     </body>
 </html>
