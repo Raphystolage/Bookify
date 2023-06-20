@@ -2,9 +2,10 @@ package hr.algebra.bookify.webapp.model;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Base64;
 
-public class JWT {
+public class JWT implements Serializable {
 
     private String jwt;
 
@@ -24,19 +25,6 @@ public class JWT {
     @Override
     public String toString() {
         return jwt;
-    }
-
-    public String getAuthority() {
-        try {
-            String string = jwt.split("\\.")[1];
-            byte[] decodedBytes = Base64.getDecoder().decode(string);
-            String decodedString = new String(decodedBytes, "UTF-8");
-            JSONObject jsonObject = new JSONObject(decodedString);
-            return jsonObject.getString("authority");
-        } catch (Exception e) {
-            System.out.println("Error while getting authority" + e.getMessage());
-        }
-        return null;
     }
 
 }

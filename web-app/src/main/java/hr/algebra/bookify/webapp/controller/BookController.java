@@ -23,6 +23,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,7 +80,7 @@ public class BookController {
     @GetMapping("new")
     public String showCreateForm(Model model, HttpSession session) {
         JWT token = getToken(session);
-        if(token==null||!token.getAuthority().equals("ADMIN"))
+        if(token==null)
             return "redirect:/";
         model.addAttribute("book", new Book());
         model.addAttribute("redirectionUrl","/book/new");
@@ -97,9 +98,13 @@ public class BookController {
         book.setType(BookType.valueOf(bookType));
         if(StringSecurity.isSafe(title+author)) {
             JWT token = getToken(session);
-            if(token==null||!token.getAuthority().equals("ADMIN"))
+            if(token==null)
                 return "redirect:/";
-            bookService.create(book, token.getJwt());
+            try {
+                bookService.create(book, token.getJwt());
+            } catch(HttpClientErrorException e) {
+                logger.error("Unautorized action");
+            }
         } else
             logger.error("Unauthorized character or word detected");
         return "redirect:/book";
@@ -108,7 +113,7 @@ public class BookController {
     @GetMapping("edit/{id}")
     public String showUpdateForm(@PathVariable("id") Long id, Model model, HttpSession session) {
         JWT token = getToken(session);
-        if(token==null||!token.getAuthority().equals("ADMIN"))
+        if(token==null)
             return "redirect:/";
         Book book = bookService.getById(id, token.getJwt());
         model.addAttribute("book", book);
@@ -128,9 +133,13 @@ public class BookController {
         book.setType(BookType.valueOf(bookType));
         if(StringSecurity.isSafe(title+author)) {
             JWT token = getToken(session);
-            if(token==null||!token.getAuthority().equals("ADMIN"))
+            if(token==null)
                 return "redirect:/";
-            bookService.update(book, token.getJwt());
+            try {
+                bookService.update(book, token.getJwt());
+            } catch(HttpClientErrorException e) {
+                logger.error("Unautorized action");
+            }
         } else
             logger.error("Unauthorized characters or word detected");
         return "redirect:/book";
@@ -139,9 +148,13 @@ public class BookController {
     @GetMapping("delete/{id}")
     public String deleteById(@PathVariable("id") Long id, HttpSession session) {
         JWT token = getToken(session);
-        if(token==null||!token.getAuthority().equals("ADMIN"))
+        if(token==null)
             return "redirect:/";
-        bookService.deleteById(id, token.getJwt());
+        try {
+            bookService.deleteById(id, token.getJwt());
+        } catch(HttpClientErrorException e) {
+            logger.error("Unautorized action");
+        }
         return "redirect:/book";
     }
 
@@ -163,7 +176,7 @@ public class BookController {
     public String importBooks(@RequestParam("file") MultipartFile file, HttpSession session) {
 
         JWT token = getToken(session);
-        if(token==null||!token.getAuthority().equals("ADMIN"))
+        if(token==null)
             return "redirect:/";
 
         if (file.isEmpty()) {
@@ -180,11 +193,15 @@ public class BookController {
             e.printStackTrace();
         }
 
-        List<Book> books = SerializeBookList.deserializeBookList(fileName);
-        for(Book book : books) {
-            book.setId(null);
-            bookService.create(book, token.getJwt());
-            logger.info("Book \"" + book.getTitle() + "\" imported");
+        try {
+            List<Book> books = SerializeBookList.deserializeBookList(fileName);
+            for(Book book : books) {
+                book.setId(null);
+                bookService.create(book, token.getJwt());
+                logger.info("Book \"" + book.getTitle() + "\" imported");
+            }
+        } catch(HttpClientErrorException e) {
+            logger.error("Unautorized action");
         }
 
         return "redirect:/book";
