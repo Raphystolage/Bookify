@@ -55,7 +55,7 @@ public class SerializeBookList {
         } catch (SecurityException se) {
             LOGGER.error(se.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Wrong file type");
         }
         
         return list;

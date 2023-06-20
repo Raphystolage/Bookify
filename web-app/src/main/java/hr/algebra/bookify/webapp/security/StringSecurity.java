@@ -11,8 +11,7 @@ public class StringSecurity {
             "ALTER",
             "CREATE",
             "DROP",
-            "DELETE",
-            "OR"
+            "DELETE"
     };
 
     public final static String[] CHAR_BLACK_LIST = {
@@ -20,7 +19,9 @@ public class StringSecurity {
             "<",
             ">",
             "/",
-            "\\"
+            "\\",
+            "=",
+            "--"
     };
 
     public static String checkRegex() {
