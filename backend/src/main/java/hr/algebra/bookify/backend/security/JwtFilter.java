@@ -34,12 +34,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
             log.trace("doFilter for endpoint: {} resolved jwt: {}", request.getRequestURI(), jwtToken);
 
-            if (jwtToken != null && !jwtToken.isEmpty()) { // only validate token if it exists in the request
+            if (jwtToken != null && !jwtToken.isEmpty() && !jwtService.isJwtInvalid(jwtToken)) { // only validate token if it exists in the request
 
-                boolean authenticate = jwtService.authenticate(jwtToken);
-
-                if (!authenticate) {
+                if(!request.getMethod().equals("GET")&&!jwtService.getAuthorityKey(jwtToken).equals("ADMIN")) {
                     unauthorized(response);
+                } else {
+                    jwtService.authenticate(jwtToken);
                 }
 
             } else { // no token, user is unauthorized

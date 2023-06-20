@@ -27,18 +27,9 @@ public class JwtService {
     @Value("${security.authentication.jwt.base64-secret}")
     private String secretKey;
 
-    public boolean authenticate(String token) {
-
-        // If JWT is invalid, user can not be authenticated
-        if (isJwtInvalid(token)) {
-            return false;
-        }
-
-        // JWT is valid, store authentication in Spring security context
+    public void authenticate(String token) {
         ApplicationUser applicationUser = getUserDataFromJwt(token);
         saveAuthentication(applicationUser);
-
-        return true;
     }
 
     public String createJwt(User user) {
@@ -55,7 +46,7 @@ public class JwtService {
                 .compact();
     }
 
-    private boolean isJwtInvalid(String jwtToken) {
+    public boolean isJwtInvalid(String jwtToken) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             return false;
@@ -97,6 +88,11 @@ public class JwtService {
     private void saveAuthentication(ApplicationUser applicationUser) {
         Authentication authentication = new UserAuthentication(applicationUser);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    public String getAuthorityKey(String jwtToken) {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken).getBody();
+        return claims.get(AUTHORITY_KEY).toString();
     }
 
 }
