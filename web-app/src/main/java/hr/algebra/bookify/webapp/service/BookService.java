@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class BookService {
 
-    private static final String URL = "http://10.42.0.1:8080/book";
+    private static final String URL = "http://localhost:8080/book";
     private static final RestTemplate REST_TEMPLATE = new RestTemplate();
 
     public Book create(Book newBook, String token) {

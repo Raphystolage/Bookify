@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -40,10 +41,10 @@ public class BookController {
 
     @GetMapping
     public String getAll(Model model, HttpSession session) {
-        String token = getToken(session);
+        JWT token = getToken(session);
         if(token==null)
             return "redirect:/";
-        List<Book> books = bookService.getAll(token);
+        List<Book> books = bookService.getAll(token.getJwt());
         model.addAttribute("books", books);
         return "book-list";
     }
@@ -61,22 +62,25 @@ public class BookController {
 
     @GetMapping("{id}")
     public String getById(@PathVariable("id") Long id, Model model, HttpSession session) {
-        String token = getToken(session);
-        if(token==null)
+        JWT token = getToken(session);
+        if (token == null)
             return "redirect:/";
-        Book book = bookService.getById(id, token);
-        if(book==null) {
-            return "redirect:/book";
-        } else {
+        try {
+            Book book = bookService.getById(id, token.getJwt());
             List<Book> books = new ArrayList<>();
             books.add(book);
             model.addAttribute("books", books);
             return "book-list";
+        } catch(HttpClientErrorException e) {
+            return "redirect:/book";
         }
     }
 
     @GetMapping("new")
-    public String showCreateForm(Model model) {
+    public String showCreateForm(Model model, HttpSession session) {
+        JWT token = getToken(session);
+        if(token==null||!token.getAuthority().equals("ADMIN"))
+            return "redirect:/";
         model.addAttribute("book", new Book());
         model.addAttribute("redirectionUrl","/book/new");
         return "book-form";
@@ -92,10 +96,10 @@ public class BookController {
         book.setAuthor(author);
         book.setType(BookType.valueOf(bookType));
         if(StringSecurity.isSafe(title+author)) {
-            String token = getToken(session);
-            if(token==null)
+            JWT token = getToken(session);
+            if(token==null||!token.getAuthority().equals("ADMIN"))
                 return "redirect:/";
-            bookService.create(book, token);
+            bookService.create(book, token.getJwt());
         } else
             logger.error("Unauthorized character or word detected");
         return "redirect:/book";
@@ -103,10 +107,10 @@ public class BookController {
 
     @GetMapping("edit/{id}")
     public String showUpdateForm(@PathVariable("id") Long id, Model model, HttpSession session) {
-        String token = getToken(session);
-        if(token==null)
+        JWT token = getToken(session);
+        if(token==null||!token.getAuthority().equals("ADMIN"))
             return "redirect:/";
-        Book book = bookService.getById(id, token);
+        Book book = bookService.getById(id, token.getJwt());
         model.addAttribute("book", book);
         model.addAttribute("redirectionUrl","/book/edit/"+id);
         return "book-form";
@@ -123,10 +127,10 @@ public class BookController {
         book.setAuthor(author);
         book.setType(BookType.valueOf(bookType));
         if(StringSecurity.isSafe(title+author)) {
-            String token = getToken(session);
-            if(token==null)
+            JWT token = getToken(session);
+            if(token==null||!token.getAuthority().equals("ADMIN"))
                 return "redirect:/";
-            bookService.update(book, token);
+            bookService.update(book, token.getJwt());
         } else
             logger.error("Unauthorized characters or word detected");
         return "redirect:/book";
@@ -134,19 +138,19 @@ public class BookController {
 
     @GetMapping("delete/{id}")
     public String deleteById(@PathVariable("id") Long id, HttpSession session) {
-        String token = getToken(session);
-        if(token==null)
+        JWT token = getToken(session);
+        if(token==null||!token.getAuthority().equals("ADMIN"))
             return "redirect:/";
-        bookService.deleteById(id, token);
+        bookService.deleteById(id, token.getJwt());
         return "redirect:/book";
     }
 
     @GetMapping("export")
     public ResponseEntity<Resource> export(HttpSession session) {
-        String token = getToken(session);
+        JWT token = getToken(session);
         if(token==null)
             return null;
-        String fileName = SerializeBookList.serializeBookList(new ArrayList<>(bookService.getAll(token)));
+        String fileName = SerializeBookList.serializeBookList(new ArrayList<>(bookService.getAll(token.getJwt())));
 
         Resource resource = new FileSystemResource(fileName);
 
@@ -157,6 +161,10 @@ public class BookController {
 
     @PostMapping("/import")
     public String importBooks(@RequestParam("file") MultipartFile file, HttpSession session) {
+
+        JWT token = getToken(session);
+        if(token==null||!token.getAuthority().equals("ADMIN"))
+            return "redirect:/";
 
         if (file.isEmpty()) {
             logger.warn("Empty ser file");
@@ -175,19 +183,16 @@ public class BookController {
         List<Book> books = SerializeBookList.deserializeBookList(fileName);
         for(Book book : books) {
             book.setId(null);
-            String token = getToken(session);
-            if(token==null)
-                return "redirect:/";
-            bookService.create(book, token);
+            bookService.create(book, token.getJwt());
             logger.info("Book \"" + book.getTitle() + "\" imported");
         }
 
         return "redirect:/book";
     }
     
-    public String getToken(HttpSession session) {
+    public JWT getToken(HttpSession session) {
         Object attribute = session.getAttribute("token");
-        return attribute==null ? null : ((JWT) attribute).getJwt();
+        return attribute==null ? null : (JWT) attribute;
     }
 
 }
