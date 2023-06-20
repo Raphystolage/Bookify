@@ -2,6 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="
+            default-src 'self';
+            script-src 'self';
+            style-src 'self';
+            img-src 'self';
+            font-src 'self';
+            ">
         <title>Bookify: Login</title>
         <link th:rel="stylesheet" th:href="@{/stylesheet.css}" />
         <link th:rel="icon" th:href="@{/icon.png}">

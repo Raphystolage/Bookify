@@ -39,7 +39,4 @@ public class JWT {
         return null;
     }
 
-    public static void main(String[] args) {
-        System.out.println((new JWT("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiZXhwIjoxNjg3ODAyOTMxLCJpYXQiOjE2ODcxOTgxMzEsImF1dGhvcml0eSI6IlVTRVIifQ.IZxUJYLGf6_OqNaRWZ4c4E9v0TZ6u1wlGeZ9Qn3nCaNptoFACjP7Kstca1BljP4WSLnCfqs1IdDuTwBtFWBqFw")).getAuthority());
-    }
 }
