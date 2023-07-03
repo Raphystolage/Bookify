@@ -22,11 +22,11 @@
             <table>
                 <tr>
                     <td>Title:</td>
-                    <td><input type="text" th:field="*{title}" th:value="${title}" size="50" required></td>
+                    <td><input maxlength="200" type="text" th:field="*{title}" th:value="${title}" size="50" required></td>
                 </tr>
                 <tr>
                     <td>Author:</td>
-                    <td><input type="text" th:field="*{author}" th:value="${author}" size="50" required></td>
+                    <td><input maxlength="100" type="text" th:field="*{author}" th:value="${author}" size="50" required></td>
                 </tr>
                 <tr>
                     <td>Type:</td>
